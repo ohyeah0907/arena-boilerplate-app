@@ -6,6 +6,7 @@ export default function App(props) {
   // Any .tsx or .jsx files in /pages will become a route
   // See documentation for <Routes /> for more info
   const pages = import.meta.globEager('./pages/**/!(*.test.[jt]sx)*.([jt]sx)')
+  // console.log('pages:>>', pages)
 
   let primaryActions = [
     {
@@ -25,7 +26,7 @@ export default function App(props) {
       { label: 'Privacy', pathname: '/privacy' },
     ],
   }
-  if (['hahalolo.myshopify.com','pikaku-store.myshopify.com'].includes(window.shopOrigin)) {
+  if (['hahalolo.myshopify.com', 'pikaku-store.myshopify.com'].includes(window.shopOrigin)) {
     secondaryMoreActions.items.push({ label: 'Test API', pathname: '/test-api' })
   }
 

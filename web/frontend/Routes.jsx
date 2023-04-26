@@ -72,5 +72,7 @@ function useRoutes(pages) {
     })
     .filter((route) => route.component)
 
+
+  console.log('routes:>>',routes);
   return routes
 }

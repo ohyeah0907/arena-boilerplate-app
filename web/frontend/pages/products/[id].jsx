@@ -4,10 +4,13 @@ import ProductApi from '../../apis/product'
 import AppHeader from '../../components/AppHeader'
 import SkeletonPage from '../../components/SkeletonPage'
 import CreateForm from './CreateForm'
-import { useParams } from 'react-router-dom'
+import { useLocation, useParams } from 'react-router-dom'
 
 function DetailPage(props) {
   let { id } = useParams()
+
+  let path = useLocation()
+  console.log('location:>>', path.pathname)
 
   const [product, setProduct] = useState(null)
 
