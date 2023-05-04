@@ -1,7 +1,15 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { PlusMinor } from '@shopify/polaris-icons'
-import { Badge, Button, Divider, LegacyStack, Text, TextField } from '@shopify/polaris'
+import { PlusMinor, DeleteMinor } from '@shopify/polaris-icons'
+import {
+  Badge,
+  Button,
+  Divider,
+  HorizontalStack,
+  LegacyStack,
+  Text,
+  TextField,
+} from '@shopify/polaris'
 
 const InitOption = {}
 
@@ -13,14 +21,39 @@ function ListOption(props) {
       {data.value.map((option) =>
         data.editValue.includes(option.id) ? (
           <LegacyStack vertical>
-            <LegacyStack>
-              <LegacyStack.Item fill>
-                <TextField />
-              </LegacyStack.Item>
-              <LegacyStack.Item>
-                <Button>Delete</Button>
-              </LegacyStack.Item>
+            <Text as="h2">Option name</Text>
+            <LegacyStack vertical>
+              <HorizontalStack blockAlign="center" gap="4">
+                <LegacyStack.Item fill>
+                  <TextField value={option.name} />
+                </LegacyStack.Item>
+                <LegacyStack.Item>
+                  <Button plain icon={DeleteMinor} />
+                </LegacyStack.Item>
+              </HorizontalStack>
             </LegacyStack>
+            <Text as="h2">Option values</Text>
+            <LegacyStack vertical>
+              {option.values.map((item, index) => (
+                <HorizontalStack blockAlign="center" gap="4" key={index}>
+                  <LegacyStack.Item fill>
+                    <TextField value={item} />
+                  </LegacyStack.Item>
+                  <LegacyStack.Item>
+                    <Button plain icon={DeleteMinor} />
+                  </LegacyStack.Item>
+                </HorizontalStack>
+              ))}
+              <HorizontalStack blockAlign="center" gap="4">
+                <LegacyStack.Item fill>
+                  <TextField placeholder="Add another value" />
+                </LegacyStack.Item>
+                <LegacyStack.Item>
+                  <Button plain disabled />
+                </LegacyStack.Item>
+              </HorizontalStack>
+            </LegacyStack>
+            <Button>Done</Button>
             <Divider />
           </LegacyStack>
         ) : (
