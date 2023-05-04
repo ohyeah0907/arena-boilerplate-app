@@ -5,6 +5,7 @@ import AppHeader from '../../components/AppHeader'
 import ValidateForm from '../../helpers/validateForm'
 import FormControl from '../../components/FormControl'
 import ProductApi from '../../apis/product'
+import Variants from './[id]/variants'
 
 CreateForm.propTypes = {
   // ...appProps,
@@ -69,10 +70,16 @@ const InitFormData = {
   },
   product_options: {
     type: 'autocomplete',
-    label: 'Product type',
-    value: '',
+    label: '',
+    value: [],
+    editValue: [],
     error: '',
-    options: [],
+    options: [
+      { label: 'Size', value: 'Size' },
+      { label: 'Color', value: 'Color' },
+      { label: 'Material', value: 'Material' },
+      { label: 'Style', value: 'Style' },
+    ],
   },
 }
 
@@ -87,6 +94,13 @@ function CreateForm(props) {
     if (created.id) {
       Array.from(['title', 'body_html', 'status', 'vendor', 'product_type']).map(
         (key) => (_formData[key] = { ..._formData[key], value: created[key] || '' })
+      )
+      Array.from(['product_options']).map(
+        (key) =>
+          (_formData[key] = {
+            ..._formData[key],
+            value: created['options'][0].name === 'Title' ? [] : created['options'],
+          })
       )
     } else {
       /**
@@ -139,6 +153,7 @@ function CreateForm(props) {
         // create
         res = await ProductApi.create({ product: data })
       }
+      console.log('res', res)
       if (!res.success) throw res.error
 
       actions.showNotify({ message: created.id ? 'Saved' : 'Created' })
@@ -154,7 +169,14 @@ function CreateForm(props) {
 
   if (!formData) return null
 
-  console.log('formData>>>',formData);
+  console.log('formData>>>', formData)
+
+  const handleEdit = (option) => {
+    let _formData = { ...formData }
+    let _editValue = [..._formData['product_options'].editValue, option]
+    _formData['product_options'].editValue = _editValue
+    setFormData(_formData)
+  }
 
   return (
     <Stack vertical alignment="fill">
@@ -190,6 +212,12 @@ function CreateForm(props) {
               />
             </Stack.Item>
           </Stack>
+        </Stack>
+      </Card>
+
+      <Card sectioned>
+        <Stack distribution="fillEvenly">
+          <Variants data={formData['product_options']} handleEdit={handleEdit} />
         </Stack>
       </Card>
 
