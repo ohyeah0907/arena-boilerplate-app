@@ -63,6 +63,13 @@ const validateField = (fieldData) => {
           }
           break
 
+        case 'unique':
+          _fieldData.value.forEach((item) => {
+            if (item.name === value) {
+              throw new Error(validate[key][1])
+            }
+          })
+          break
         default:
           break
       }

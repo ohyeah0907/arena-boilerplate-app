@@ -74,6 +74,10 @@ const InitFormData = {
     value: [],
     editValue: [],
     error: '',
+    validate: {
+      unique: [true, 'Unique!'],
+      required: [true, 'Required!'],
+    },
     options: [
       { label: 'Size', value: 'Size' },
       { label: 'Color', value: 'Color' },
@@ -169,11 +173,18 @@ function CreateForm(props) {
 
   if (!formData) return null
 
-  console.log('formData>>>', formData)
+  console.log('formData:>>', formData)
 
   const handleEdit = (option) => {
     let _formData = { ...formData }
     let _editValue = [..._formData['product_options'].editValue, option]
+    _formData['product_options'].editValue = _editValue
+    setFormData(_formData)
+  }
+
+  const handleRemoveEdit = (option) => {
+    let _formData = { ...formData }
+    let _editValue = _formData['product_options'].editValue.filter((_option) => _option !== option)
     _formData['product_options'].editValue = _editValue
     setFormData(_formData)
   }
@@ -217,7 +228,11 @@ function CreateForm(props) {
 
       <Card sectioned>
         <Stack distribution="fillEvenly">
-          <Variants data={formData['product_options']} handleEdit={handleEdit} />
+          <Variants
+            data={formData['product_options']}
+            handleEdit={handleEdit}
+            handleRemoveEdit={handleRemoveEdit}
+          />
         </Stack>
       </Card>
 

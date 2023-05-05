@@ -11,16 +11,16 @@ import {
   TextField,
 } from '@shopify/polaris'
 
-const InitOption = {}
+const InitFormOption = {}
 
 function ListOption(props) {
-  const { data, handleEdit } = props
-
+  const { data, handleEdit, handleRemoveEdit } = props
+  console.log('data:>>', data)
   return (
     <LegacyStack vertical>
       {data.value.map((option) =>
         data.editValue.includes(option.id) ? (
-          <LegacyStack vertical>
+          <LegacyStack vertical key={option.id}>
             <Text as="h2">Option name</Text>
             <LegacyStack vertical>
               <HorizontalStack blockAlign="center" gap="4">
@@ -53,34 +53,32 @@ function ListOption(props) {
                 </LegacyStack.Item>
               </HorizontalStack>
             </LegacyStack>
-            <Button>Done</Button>
+            <Button onClick={() => handleRemoveEdit(option.id)}>Done</Button>
             <Divider />
           </LegacyStack>
         ) : (
-          <div key={option.id}>
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                paddingBottom: '1rem',
-              }}
-            >
-              <LegacyStack vertical>
-                <Text>{option.name}</Text>
+          <LegacyStack vertical key={option.id}>
+            <LegacyStack>
+              <LegacyStack.Item fill vertical>
+                <div style={{ marginBottom: '0.3rem' }}>
+                  <Text>{option.name}</Text>
+                </div>
+
                 <LegacyStack>
                   {option.values.map((item, index) => (
                     <Badge key={index}>{item}</Badge>
                   ))}
                 </LegacyStack>
-              </LegacyStack>
-              <div>
+              </LegacyStack.Item>
+              <LegacyStack.Item>
                 <Button onClick={() => handleEdit(option.id)} size="slim">
                   Edit
                 </Button>
-              </div>
-            </div>
+              </LegacyStack.Item>
+            </LegacyStack>
+
             <Divider />
-          </div>
+          </LegacyStack>
         )
       )}
       {data.value.length < 3 && (

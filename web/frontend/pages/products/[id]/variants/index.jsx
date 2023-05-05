@@ -14,15 +14,15 @@ Variants.defaultProps = {
 }
 
 function Variants(props) {
-  const { data, handleEdit } = props
+  const { data, handleEdit, handleRemoveEdit } = props
 
-  console.log('props parent:>>', props)
+  // console.log('props parent:>>', props)
   return (
     <LegacyStack vertical distribution="fillEvenly">
       <Text as="h1">Variants</Text>
       <Divider />
 
-      <ListOption data={data} handleEdit={handleEdit} />
+      <ListOption data={data} handleEdit={handleEdit} handleRemoveEdit={handleRemoveEdit} />
 
       {/* <Table /> */}
     </LegacyStack>
