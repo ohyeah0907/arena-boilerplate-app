@@ -1,6 +1,7 @@
 import { Autocomplete } from '@shopify/polaris'
 
 function MyAutocomplete(props) {
+  // console.log(props)
   return (
     <Autocomplete
       options={

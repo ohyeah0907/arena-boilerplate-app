@@ -2,6 +2,7 @@ import { RadioButton, Select, Stack, TextField } from '@shopify/polaris'
 import MyDropZoneMultiple from '../MyDropZoneMultiple'
 import MyDropZoneSingle from '../MyDropZoneSingle'
 import MyAutocomplete from '../MyAutocomplete'
+import ListOption from '../ListOption'
 
 function FormControl(props) {
   let label = props.label ? (
@@ -52,6 +53,9 @@ function FormControl(props) {
 
     case 'autocomplete':
       return <MyAutocomplete {...props} label={label || ''} />
+
+    case 'minioptions':
+      return <ListOption {...props} />
 
     default:
       // text

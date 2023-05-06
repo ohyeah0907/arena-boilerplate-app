@@ -9,9 +9,7 @@ import ConfirmModal from '../../components/ConfirmModal'
 
 function ProductsPage(props) {
   const { actions, location } = props
-
   const [searchParams, setSearchParams] = useSearchParams()
-
   const [count, setCount] = useState(null)
   const [products, setProducts] = useState(null)
   const [deleted, setDeleted] = useState(null)

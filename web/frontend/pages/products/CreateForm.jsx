@@ -69,7 +69,7 @@ const InitFormData = {
     options: [],
   },
   product_options: {
-    type: 'autocomplete',
+    type: 'minioptions',
     label: '',
     value: [],
     editValue: [],
@@ -229,7 +229,7 @@ function CreateForm(props) {
       <Card sectioned>
         <Stack distribution="fillEvenly">
           <Variants
-            data={formData['product_options']}
+            {...formData['product_options']}
             handleEdit={handleEdit}
             handleRemoveEdit={handleRemoveEdit}
           />

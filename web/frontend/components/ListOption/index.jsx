@@ -14,19 +14,18 @@ import {
 const InitFormOption = {}
 
 function ListOption(props) {
-  const { data, handleEdit, handleRemoveEdit } = props
-  console.log('data:>>', data)
+  const { value, editValue, handleEdit, handleRemoveEdit } = props
+  console.log('List props:>>', props)
+  console.log('List Option:>>', value)
   return (
     <LegacyStack vertical>
-      {data.value.map((option) =>
-        data.editValue.includes(option.id) ? (
+      {value.map((option) =>
+        editValue.includes(option.id) ? (
           <LegacyStack vertical key={option.id}>
             <Text as="h2">Option name</Text>
             <LegacyStack vertical>
               <HorizontalStack blockAlign="center" gap="4">
-                <LegacyStack.Item fill>
-                  <TextField value={option.name} />
-                </LegacyStack.Item>
+                <LegacyStack.Item fill>F</LegacyStack.Item>
                 <LegacyStack.Item>
                   <Button plain icon={DeleteMinor} />
                 </LegacyStack.Item>
@@ -81,7 +80,7 @@ function ListOption(props) {
           </LegacyStack>
         )
       )}
-      {data.value.length < 3 && (
+      {value.length < 3 && (
         <LegacyStack vertical>
           <Button plain icon={PlusMinor}>
             Add options like size or color
