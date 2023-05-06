@@ -5,7 +5,10 @@ import AppHeader from '../../components/AppHeader'
 import ValidateForm from '../../helpers/validateForm'
 import FormControl from '../../components/FormControl'
 import ProductApi from '../../apis/product'
-import Variants from './[id]/variants'
+import Variants from './Variants'
+import { filterValidOptions, generateVariantsFromOptions } from './actions'
+import { updateLineItem } from '@shopify/app-bridge/actions/Cart'
+// import Variants from './[id]/variants'
 
 CreateForm.propTypes = {
   // ...appProps,
@@ -68,22 +71,29 @@ const InitFormData = {
     error: '',
     options: [],
   },
-  product_options: {
-    type: 'minioptions',
+  // product_options: {
+  //   type: 'minioptions',
+  //   label: '',
+  //   value: [],
+  //   editValue: [],
+  //   error: '',
+  //   validate: {
+  //     unique: [true, 'Unique!'],
+  //     required: [true, 'Required!'],
+  //   },
+  //   options: [
+  //     { label: 'Size', value: 'Size' },
+  //     { label: 'Color', value: 'Color' },
+  //     { label: 'Material', value: 'Material' },
+  //     { label: 'Style', value: 'Style' },
+  //   ],
+  // },
+  options: {
+    type: '',
     label: '',
-    value: [],
-    editValue: [],
+    value: null,
     error: '',
-    validate: {
-      unique: [true, 'Unique!'],
-      required: [true, 'Required!'],
-    },
-    options: [
-      { label: 'Size', value: 'Size' },
-      { label: 'Color', value: 'Color' },
-      { label: 'Material', value: 'Material' },
-      { label: 'Style', value: 'Style' },
-    ],
+    enabled: false,
   },
 }
 
@@ -99,13 +109,18 @@ function CreateForm(props) {
       Array.from(['title', 'body_html', 'status', 'vendor', 'product_type']).map(
         (key) => (_formData[key] = { ..._formData[key], value: created[key] || '' })
       )
-      Array.from(['product_options']).map(
-        (key) =>
-          (_formData[key] = {
-            ..._formData[key],
-            value: created['options'][0].name === 'Title' ? [] : created['options'],
-          })
-      )
+      // Array.from(['product_options']).map(
+      //   (key) =>
+      //     (_formData[key] = {
+      //       ..._formData[key],
+      //       value: created['options'][0].name === 'Title' ? [] : created['options'],
+      //     })
+      // )
+      _formData.options = {
+        ..._formData.options,
+        enabled: true,
+        value: created.options.map((item) => ({ name: item.name, values: item.values })),
+      }
     } else {
       /**
        * Sample data
@@ -147,6 +162,13 @@ function CreateForm(props) {
         vendor: validFormData.vendor.value,
         product_type: validFormData.product_type.value,
       }
+
+      let options = filterValidOptions(formData.options.value)
+      if (options.length > 0) {
+        data.options = options
+        data.variants = generateVariantsFromOptions(options)
+      }
+      console.log('data', data)
 
       let res = null
 
@@ -226,7 +248,7 @@ function CreateForm(props) {
         </Stack>
       </Card>
 
-      <Card sectioned>
+      {/* <Card sectioned>
         <Stack distribution="fillEvenly">
           <Variants
             {...formData['product_options']}
@@ -234,7 +256,9 @@ function CreateForm(props) {
             handleRemoveEdit={handleRemoveEdit}
           />
         </Stack>
-      </Card>
+      </Card> */}
+
+      <Variants formData={formData} setFormData={setFormData} />
 
       <Stack distribution="trailing">
         <Button onClick={onDiscard}>Discard</Button>

@@ -1,15 +1,17 @@
 import { Stack } from '@shopify/polaris'
 import React, { useEffect, useState } from 'react'
-import ProductApi from '../../../apis/product'
-import AppHeader from '../../../components/AppHeader'
-import SkeletonPage from '../../../components/SkeletonPage'
-import CreateForm from '../CreateForm'
+import ProductApi from '../../apis/product'
+import AppHeader from '../../components/AppHeader'
+import SkeletonPage from '../../components/SkeletonPage'
+import CreateForm from './CreateForm'
 import { useParams } from 'react-router-dom'
 
 function DetailPage(props) {
   let { id } = useParams()
 
   const [product, setProduct] = useState(null)
+
+  useEffect(() => console.log('product', product), [product])
 
   const getProduct = async (id) => {
     try {

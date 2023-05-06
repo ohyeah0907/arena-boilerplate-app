@@ -25,7 +25,7 @@ function ListOption(props) {
             <Text as="h2">Option name</Text>
             <LegacyStack vertical>
               <HorizontalStack blockAlign="center" gap="4">
-                <LegacyStack.Item fill>F</LegacyStack.Item>
+                <LegacyStack.Item fill>{option.name}</LegacyStack.Item>
                 <LegacyStack.Item>
                   <Button plain icon={DeleteMinor} />
                 </LegacyStack.Item>
