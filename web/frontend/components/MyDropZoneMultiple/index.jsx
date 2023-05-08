@@ -50,7 +50,7 @@ function MyDropZoneMultiple(props) {
 
   return (
     <DropZone onDrop={handleDropZoneDrop} allowMultiple={true}>
-      {uploadedFiles}
+      {/* {uploadedFiles} */}
       {fileUpload}
     </DropZone>
   )

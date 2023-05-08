@@ -95,6 +95,24 @@ const InitFormData = {
     error: '',
     enabled: false,
   },
+  images: {
+    name: 'images',
+    type: 'file',
+    label: '',
+    allowMultiple: true,
+    originalValue: [],
+    removeValue: [],
+    error: '',
+    required: false,
+    validate: {},
+  },
+  variants: {
+    type: '',
+    label: '',
+    value: null,
+    error: '',
+    enabled: false,
+  },
 }
 
 function CreateForm(props) {
@@ -120,6 +138,18 @@ function CreateForm(props) {
         ..._formData.options,
         enabled: true,
         value: created.options.map((item) => ({ name: item.name, values: item.values })),
+      }
+      _formData.variants = {
+        ..._formData.variants,
+        enabled: true,
+        value: created.variants.map((item) => ({
+          id: item.id,
+          title: item.title,
+          option1: item.option1,
+          option2: item.option2,
+          option3: item.option3,
+          price: item.price,
+        })),
       }
     } else {
       /**
@@ -168,18 +198,18 @@ function CreateForm(props) {
         data.options = options
         data.variants = generateVariantsFromOptions(options)
       }
-      console.log('data', data)
 
       let res = null
 
       if (created.id) {
         // update
+        console.log('data:>>', data)
         res = await ProductApi.update(created.id, { product: data })
       } else {
         // create
         res = await ProductApi.create({ product: data })
       }
-      console.log('res', res)
+
       if (!res.success) throw res.error
 
       actions.showNotify({ message: created.id ? 'Saved' : 'Created' })
@@ -197,19 +227,19 @@ function CreateForm(props) {
 
   console.log('formData:>>', formData)
 
-  const handleEdit = (option) => {
-    let _formData = { ...formData }
-    let _editValue = [..._formData['product_options'].editValue, option]
-    _formData['product_options'].editValue = _editValue
-    setFormData(_formData)
-  }
+  // const handleEdit = (option) => {
+  //   let _formData = { ...formData }
+  //   let _editValue = [..._formData['product_options'].editValue, option]
+  //   _formData['product_options'].editValue = _editValue
+  //   setFormData(_formData)
+  // }
 
-  const handleRemoveEdit = (option) => {
-    let _formData = { ...formData }
-    let _editValue = _formData['product_options'].editValue.filter((_option) => _option !== option)
-    _formData['product_options'].editValue = _editValue
-    setFormData(_formData)
-  }
+  // const handleRemoveEdit = (option) => {
+  //   let _formData = { ...formData }
+  //   let _editValue = _formData['product_options'].editValue.filter((_option) => _option !== option)
+  //   _formData['product_options'].editValue = _editValue
+  //   setFormData(_formData)
+  // }
 
   return (
     <Stack vertical alignment="fill">
@@ -244,6 +274,9 @@ function CreateForm(props) {
                 options={productTypes?.map((item) => ({ label: item, value: item })) || []}
               />
             </Stack.Item>
+          </Stack>
+          <Stack>
+            <FormControl {...formData['images']} />
           </Stack>
         </Stack>
       </Card>

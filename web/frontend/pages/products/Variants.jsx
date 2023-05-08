@@ -1,19 +1,52 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
-import { Card, Checkbox, ResourceItem, ResourceList, Stack, TextField } from '@shopify/polaris'
+import { DeleteMinor } from '@shopify/polaris-icons'
+import {
+  Button,
+  Card,
+  Checkbox,
+  LegacyStack,
+  ResourceItem,
+  ResourceList,
+  Stack,
+  Text,
+  TextField,
+} from '@shopify/polaris'
 import { generateVariantsFromOptions } from './actions'
 
 let InitOptions = Array.from({ length: 3 }).map((item) => ({ name: '', values: [] }))
 InitOptions[0].name = 'Size'
 InitOptions[0].values = ['S', 'M', 'L']
-InitOptions[1].name = 'Color'
-InitOptions[1].values = ['Black', 'White']
 
 function Variants(props) {
   const { formData, setFormData } = props
+  // let variants = formData.options.enabled
+  //   ? formData.variants.value || generateVariantsFromOptions(formData.options.value)
+  //   : []
+
   const variants = formData.options.enabled
     ? generateVariantsFromOptions(formData.options.value)
     : []
+
+  useEffect(() => {
+    if (formData.options.value) {
+      let _formData = { ...formData }
+      let _editOptions = Array.from({ length: 3 }).map((item) => ({ name: '', values: [] }))
+      _formData.options.value.map((item, index) => {
+        _editOptions[index].name = item.name
+        _editOptions[index].values = item.values
+      })
+      _formData.options.value = _editOptions
+      setFormData(_formData)
+    }
+  }, [])
+
+  // useEffect(() => {
+  //   variants = generateVariantsFromOptions(formData.options.value)
+  //   console.log('variants:>>', variants)
+  // }, [formData])
+  console.log('formaData variants:>>', formData)
+
   return (
     <Card title="Variants">
       <Card.Section>
@@ -65,11 +98,19 @@ function Variants(props) {
             renderItem={(item, index) => {
               return (
                 <ResourceItem id={index}>
-                  <div>
-                    {item.option1}
-                    {item.option2 ? ` / ${item.option2}` : ``}
-                    {item.option3 ? ` / ${item.option3}` : ``}
-                  </div>
+                  <Stack>
+                    <Stack.Item fill>
+                      <Text>
+                        {item.option1}
+                        {item.option2 ? ` / ${item.option2}` : ``}
+                        {item.option3 ? ` / ${item.option3}` : ``}
+                      </Text>
+                    </Stack.Item>
+
+                    <Stack.Item>
+                      <Button plain icon={DeleteMinor} />
+                    </Stack.Item>
+                  </Stack>
                 </ResourceItem>
               )
             }}

@@ -11,7 +11,7 @@ function DetailPage(props) {
 
   const [product, setProduct] = useState(null)
 
-  useEffect(() => console.log('product', product), [product])
+  useEffect(() => console.log('product:>>', product), [product])
 
   const getProduct = async (id) => {
     try {
