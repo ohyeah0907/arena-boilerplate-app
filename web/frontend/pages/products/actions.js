@@ -46,3 +46,14 @@ export const generateVariantsFromOptions = (options) => {
 
   return variants
 }
+
+export const getVariantsChange = (variants1, variants2) => {
+  const result = variants1.filter(
+    (elem) =>
+      !variants2.find(
+        ({ option1, option2, option3 }) =>
+          elem.option1 === option1 && elem.option2 === option2 && elem.option3 === option3
+      )
+  )
+  return result
+}

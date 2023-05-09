@@ -24,11 +24,11 @@ const update = async ({ shop, accessToken, id, data }) => {
   })
 }
 
-const _delete = async ({ shop, accessToken, id }) => {
+const _delete = async ({ shop, accessToken, idProduct, id }) => {
   return await apiCaller({
     shop,
     accessToken,
-    endpoint: `variants/${id}.json`,
+    endpoint: `products/${idProduct}/variants/${id}.json`,
     method: 'DELETE',
   })
 }

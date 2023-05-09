@@ -1,6 +1,6 @@
 import Controller from './../controllers/variant.js'
 
-export default function productRoute(app) {
+export default function variantRoute(app) {
   app.get('/api/variants/:id', Controller.findById)
   app.post('/api/products/:idProduct/variants', Controller.create)
   app.put('/api/variants/:id', Controller.update)

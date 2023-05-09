@@ -36,7 +36,7 @@ export default {
 
       const { id } = req.params
 
-      const data = await Product.update({
+      const data = await Variant.update({
         shop,
         accessToken,
         id,
@@ -53,9 +53,9 @@ export default {
     try {
       const { shop, accessToken } = getCurrentSession(req, res)
 
-      const { id } = req.params
+      const { idProduct, id } = req.params
 
-      const data = await Product.delete({ shop, accessToken, id })
+      const data = await Variant.delete({ shop, accessToken, idProduct, id })
 
       return ResponseHandler.success(res, data)
     } catch (error) {

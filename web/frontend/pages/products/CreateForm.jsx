@@ -8,6 +8,7 @@ import ProductApi from '../../apis/product'
 import Variants from './Variants'
 import { filterValidOptions, generateVariantsFromOptions } from './actions'
 import { updateLineItem } from '@shopify/app-bridge/actions/Cart'
+import VariantApi from '../../apis/variant'
 // import Variants from './[id]/variants'
 
 CreateForm.propTypes = {
@@ -91,6 +92,7 @@ const InitFormData = {
   options: {
     type: '',
     label: '',
+    originalValue: [],
     value: null,
     error: '',
     enabled: false,
@@ -107,9 +109,12 @@ const InitFormData = {
     validate: {},
   },
   variants: {
+    createVariants: [],
+    removeVariants: [],
+    originalValue: [],
     type: '',
     label: '',
-    value: null,
+    value: [],
     error: '',
     enabled: false,
   },
@@ -138,6 +143,7 @@ function CreateForm(props) {
         ..._formData.options,
         enabled: true,
         value: created.options.map((item) => ({ name: item.name, values: item.values })),
+        originalValue: created.options.map((item) => ({ name: item.name, values: item.values })),
       }
       _formData.variants = {
         ..._formData.variants,
@@ -193,16 +199,34 @@ function CreateForm(props) {
         product_type: validFormData.product_type.value,
       }
 
-      let options = filterValidOptions(formData.options.value)
-      if (options.length > 0) {
-        data.options = options
-        data.variants = generateVariantsFromOptions(options)
+      // let options = filterValidOptions(formData.options.value)
+      // if (options.length > 0) {
+      //   data.options = options
+      // data.variants = generateVariantsFromOptions(options)
+      // }
+
+      if (formData.variants.createVariants.length > 0) {
+        if (formData.options.value[0].name !== '') {
+          data.options = filterValidOptions(formData.options.value)
+          data.variants = formData.variants.originalValue
+        }
+
+        formData.variants.originalValue = []
+        formData.variants.createVariants = []
+      }
+
+      if (formData.variants.removeVariants.length > 0) {
+        formData.variants.removeVariants.map(
+          async (item) => await VariantApi.delete(created.id, item.id)
+        )
+        formData.variants.removeVariants = []
       }
 
       let res = null
 
       if (created.id) {
         // update
+
         console.log('data:>>', data)
         res = await ProductApi.update(created.id, { product: data })
       } else {
