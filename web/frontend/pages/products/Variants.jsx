@@ -5,6 +5,8 @@ import {
   Button,
   Card,
   Checkbox,
+  DataTable,
+  HorizontalStack,
   LegacyStack,
   ResourceItem,
   ResourceList,
@@ -12,7 +14,12 @@ import {
   Text,
   TextField,
 } from '@shopify/polaris'
-import { generateVariantsFromOptions, getVariantsChange } from './actions'
+import {
+  generateVariantsFromOptions,
+  getSameVariants,
+  getVariantTitle,
+  getVariantsChange,
+} from './actions'
 
 let InitOptions = Array.from({ length: 3 }).map((item) => ({ name: '', values: [] }))
 InitOptions[0].name = 'Size'
@@ -20,72 +27,6 @@ InitOptions[0].values = ['S', 'M', 'L']
 
 function Variants(props) {
   const { formData, setFormData } = props
-  const [variants, setVariants] = useState(formData.variants.value || [])
-
-  // const variants = formData.options.enabled
-  //   ? generateVariantsFromOptions(formData.options.value)
-  //   : []
-
-  useEffect(() => {
-    if (formData.options.value) {
-      let _formData = JSON.parse(JSON.stringify(formData))
-      let _editOptions = Array.from({ length: 3 }).map((item) => ({ name: '', values: [] }))
-      _formData.options.value.map((item, index) => {
-        _editOptions[index].name = item.name
-        _editOptions[index].values = item.values
-      })
-      _formData.options.value = _editOptions
-      setFormData(_formData)
-    }
-  }, [])
-
-  // useEffect(() => {
-  //   variants = generateVariantsFromOptions(formData.options.value)
-  //   console.log('variants:>>', variants)
-  // }, [formData])
-  // console.log('formaData variants:>>', formData)
-
-  const HandleChangeOptions = (value, index) => {
-    let _formData = JSON.parse(JSON.stringify(formData))
-    _formData.options.value[index].values = value.split(',')
-
-    let _createVariants = getVariantsChange(
-      [...generateVariantsFromOptions(_formData.options.value)],
-      [..._formData.variants.value]
-    )
-
-    let _deleteVariants = getVariantsChange(
-      [..._formData.variants.value],
-      [...generateVariantsFromOptions(_formData.options.value)]
-    )
-
-    _formData.variants.createVariants = [..._createVariants]
-    _formData.variants.removeVariants = [..._deleteVariants]
-
-    let _variants = getVariantsChange([..._formData.variants.value], _deleteVariants)
-    _variants = _variants.concat(_createVariants)
-    _formData.variants.originalValue = _variants
-
-    setVariants(_variants)
-    setFormData(_formData)
-  }
-
-  const HandleRemoveVariant = (item) => {
-    let _formData = { ...formData }
-    // console.log('remove', _formData.variants.removeVariants)
-    if (item.id) {
-      _formData.variants.removeVariants.push(item)
-    } else {
-      _formData.variants.createVariants = getVariantsChange(_formData.variants.createVariants, [
-        item,
-      ])
-    }
-
-    let _variants = getVariantsChange(variants, [item])
-    _formData.variants.originalValue = _variants
-    setVariants(_variants)
-    setFormData(_formData)
-  }
 
   return (
     <Card title="Variants">
@@ -98,7 +39,9 @@ function Variants(props) {
             let _enabled = !_formData.options.enabled
             _formData.options.enabled = _enabled
             _formData.options.value = _enabled ? InitOptions : null
-            setVariants(generateVariantsFromOptions(_formData.options.value))
+            _formData.options.variants = _enabled
+              ? generateVariantsFromOptions(_formData.options.value)
+              : []
             setFormData(_formData)
           }}
         />
@@ -114,6 +57,9 @@ function Variants(props) {
                   onChange={(value) => {
                     let _formData = { ...formData }
                     _formData.options.value[index].name = value
+                    _formData.options.variants = generateVariantsFromOptions(
+                      _formData.options.value
+                    )
                     setFormData(_formData)
                   }}
                 />
@@ -121,7 +67,12 @@ function Variants(props) {
                   label="values"
                   value={item.values.join(',')}
                   onChange={(value) => {
-                    HandleChangeOptions(value, index)
+                    let _formData = { ...formData }
+                    _formData.options.value[index].values = value.split(',')
+                    _formData.options.variants = generateVariantsFromOptions(
+                      _formData.options.value
+                    )
+                    setFormData(_formData)
                   }}
                 />
               </Stack>
@@ -129,31 +80,42 @@ function Variants(props) {
           </Card.Section>
         ))}
 
-      {variants.length > 0 && (
+      {formData.options.variants.length > 0 && (
         <Card.Section title="Variants">
-          <ResourceList
-            resourceName={{ singular: 'variant', plural: 'variants' }}
-            items={variants}
-            renderItem={(item, index) => {
-              return (
-                <ResourceItem id={index}>
-                  <Stack>
-                    <Stack.Item fill>
-                      <Text>
-                        {item.option1}
-                        {item.option2 ? ` / ${item.option2}` : ``}
-                        {item.option3 ? ` / ${item.option3}` : ``}
-                      </Text>
-                      <Text>Price: {item.price || 0}</Text>
-                    </Stack.Item>
-
-                    <Stack.Item>
-                      <Button plain icon={DeleteMinor} onClick={() => HandleRemoveVariant(item)} />
-                    </Stack.Item>
-                  </Stack>
-                </ResourceItem>
-              )
-            }}
+          <DataTable
+            headings={['Variant', 'Price', 'Compare At Price', '']}
+            columnContentTypes={['text', 'text', 'text', 'text']}
+            rows={formData.options.variants.map((item, index) => [
+              <div style={{ whiteSpace: 'nowrap' }}>{getVariantTitle(item)}</div>,
+              <TextField
+                prefix="$"
+                value={item.price || ''}
+                onChange={(value) => {
+                  let _formData = { ...formData }
+                  _formData.options.variants[index].price = value
+                  setFormData(_formData)
+                }}
+              />,
+              <TextField
+                prefix="$"
+                value={item.compare_at_price || ''}
+                onChange={(value) => {
+                  let _formData = { ...formData }
+                  _formData.options.variants[index].compare_at_price = value
+                  setFormData(_formData)
+                }}
+              />,
+              <Button
+                icon={DeleteMinor}
+                onClick={() => {
+                  let _formData = { ...formData }
+                  _formData.options.variants = _formData.options.variants.filter(
+                    (_item, _index) => _index !== index
+                  )
+                  setFormData(_formData)
+                }}
+              />,
+            ])}
           />
         </Card.Section>
       )}

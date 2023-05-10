@@ -47,6 +47,13 @@ export const generateVariantsFromOptions = (options) => {
   return variants
 }
 
+export const getVariantTitle = (item) => {
+  let title = item.option1
+  title += item.option2 ? ` / ${item.option2}` : ``
+  title += item.option3 ? ` / ${item.option3}` : ``
+  return title
+}
+
 export const getVariantsChange = (variants1, variants2) => {
   const result = variants1.filter(
     (elem) =>
@@ -56,4 +63,14 @@ export const getVariantsChange = (variants1, variants2) => {
       )
   )
   return result
+}
+
+export const getSameVariants = (variants1, variants2) => {
+  const result = variants1.filter((elem) =>
+    variants2.find(
+      ({ option1, option2, option3 }) =>
+        elem.option1 === option1 && elem.option2 === option2 && elem.option3 === option3
+    )
+  )
+  return result.length > 0
 }

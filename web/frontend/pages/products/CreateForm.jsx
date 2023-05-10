@@ -72,51 +72,13 @@ const InitFormData = {
     error: '',
     options: [],
   },
-  // product_options: {
-  //   type: 'minioptions',
-  //   label: '',
-  //   value: [],
-  //   editValue: [],
-  //   error: '',
-  //   validate: {
-  //     unique: [true, 'Unique!'],
-  //     required: [true, 'Required!'],
-  //   },
-  //   options: [
-  //     { label: 'Size', value: 'Size' },
-  //     { label: 'Color', value: 'Color' },
-  //     { label: 'Material', value: 'Material' },
-  //     { label: 'Style', value: 'Style' },
-  //   ],
-  // },
   options: {
     type: '',
     label: '',
-    originalValue: [],
     value: null,
     error: '',
     enabled: false,
-  },
-  images: {
-    name: 'images',
-    type: 'file',
-    label: '',
-    allowMultiple: true,
-    originalValue: [],
-    removeValue: [],
-    error: '',
-    required: false,
-    validate: {},
-  },
-  variants: {
-    createVariants: [],
-    removeVariants: [],
-    originalValue: [],
-    type: '',
-    label: '',
-    value: [],
-    error: '',
-    enabled: false,
+    variants: [],
   },
 }
 
@@ -125,6 +87,8 @@ function CreateForm(props) {
 
   const [formData, setFormData] = useState(null)
 
+  useEffect(() => console.log('formData', formData), [formData])
+
   useEffect(() => {
     let _formData = JSON.parse(JSON.stringify(InitFormData))
 
@@ -132,30 +96,19 @@ function CreateForm(props) {
       Array.from(['title', 'body_html', 'status', 'vendor', 'product_type']).map(
         (key) => (_formData[key] = { ..._formData[key], value: created[key] || '' })
       )
-      // Array.from(['product_options']).map(
-      //   (key) =>
-      //     (_formData[key] = {
-      //       ..._formData[key],
-      //       value: created['options'][0].name === 'Title' ? [] : created['options'],
-      //     })
-      // )
       _formData.options = {
         ..._formData.options,
         enabled: true,
         value: created.options.map((item) => ({ name: item.name, values: item.values })),
-        originalValue: created.options.map((item) => ({ name: item.name, values: item.values })),
+        variants: created.variants,
       }
-      _formData.variants = {
-        ..._formData.variants,
-        enabled: true,
-        value: created.variants.map((item) => ({
-          id: item.id,
-          title: item.title,
-          option1: item.option1,
-          option2: item.option2,
-          option3: item.option3,
-          price: item.price,
-        })),
+      if (_formData.options.value.length < 3) {
+        _formData.options.value = _formData.options.value.concat(
+          Array.from({ length: 3 - _formData.options.value.length }).map(() => ({
+            name: '',
+            values: [],
+          }))
+        )
       }
     } else {
       /**
@@ -199,35 +152,17 @@ function CreateForm(props) {
         product_type: validFormData.product_type.value,
       }
 
-      // let options = filterValidOptions(formData.options.value)
-      // if (options.length > 0) {
-      //   data.options = options
-      // data.variants = generateVariantsFromOptions(options)
-      // }
-
-      if (formData.variants.createVariants.length > 0) {
-        if (formData.options.value[0].name !== '') {
-          data.options = filterValidOptions(formData.options.value)
-          data.variants = formData.variants.originalValue
-        }
-
-        formData.variants.originalValue = []
-        formData.variants.createVariants = []
+      let options = filterValidOptions(formData.options.value)
+      if (options.length > 0) {
+        data.options = options
+        data.variants = formData.options.variants
       }
-
-      if (formData.variants.removeVariants.length > 0) {
-        formData.variants.removeVariants.map(
-          async (item) => await VariantApi.delete(created.id, item.id)
-        )
-        formData.variants.removeVariants = []
-      }
+      console.log('data:>>', data)
 
       let res = null
 
       if (created.id) {
         // update
-
-        console.log('data:>>', data)
         res = await ProductApi.update(created.id, { product: data })
       } else {
         // create
