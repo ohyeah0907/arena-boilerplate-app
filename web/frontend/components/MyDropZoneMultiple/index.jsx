@@ -24,6 +24,8 @@ function MyDropZoneMultiple(props) {
     setFiles((files) => [...files, ...acceptedFiles])
   }, [])
 
+  console.log('Images:>>', files)
+
   const validImageTypes = ['image/gif', 'image/jpeg', 'image/png']
 
   const fileUpload = !files.length && <DropZone.FileUpload />
@@ -50,7 +52,7 @@ function MyDropZoneMultiple(props) {
 
   return (
     <DropZone onDrop={handleDropZoneDrop} allowMultiple={true}>
-      {/* {uploadedFiles} */}
+      {uploadedFiles}
       {fileUpload}
     </DropZone>
   )

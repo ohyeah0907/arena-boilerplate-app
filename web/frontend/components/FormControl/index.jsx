@@ -54,9 +54,6 @@ function FormControl(props) {
     case 'autocomplete':
       return <MyAutocomplete {...props} label={label || ''} />
 
-    case 'minioptions':
-      return <ListOption {...props} />
-
     default:
       // text
       return (

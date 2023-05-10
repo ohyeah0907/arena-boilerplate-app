@@ -1,25 +1,7 @@
-import React, { useEffect, useState } from 'react'
-import PropTypes from 'prop-types'
+import React from 'react'
 import { DeleteMinor } from '@shopify/polaris-icons'
-import {
-  Button,
-  Card,
-  Checkbox,
-  DataTable,
-  HorizontalStack,
-  LegacyStack,
-  ResourceItem,
-  ResourceList,
-  Stack,
-  Text,
-  TextField,
-} from '@shopify/polaris'
-import {
-  generateVariantsFromOptions,
-  getSameVariants,
-  getVariantTitle,
-  getVariantsChange,
-} from './actions'
+import { Button, Card, Checkbox, DataTable, Stack, TextField } from '@shopify/polaris'
+import { generateVariantsFromOptions, getVariantTitle } from './actions'
 
 let InitOptions = Array.from({ length: 3 }).map((item) => ({ name: '', values: [] }))
 InitOptions[0].name = 'Size'

@@ -9,6 +9,7 @@ import Variants from './Variants'
 import { filterValidOptions, generateVariantsFromOptions } from './actions'
 import { updateLineItem } from '@shopify/app-bridge/actions/Cart'
 import VariantApi from '../../apis/variant'
+import ShowMultiple from './showMultiple'
 // import Variants from './[id]/variants'
 
 CreateForm.propTypes = {
@@ -80,6 +81,18 @@ const InitFormData = {
     enabled: false,
     variants: [],
   },
+  images: {
+    name: 'images',
+    type: 'file',
+    label: '',
+    value: [],
+    allowMultiple: true,
+    originalValue: [],
+    removeValue: [],
+    error: '',
+    required: false,
+    validate: {},
+  },
 }
 
 function CreateForm(props) {
@@ -110,6 +123,7 @@ function CreateForm(props) {
           }))
         )
       }
+      _formData.images = created.images
     } else {
       /**
        * Sample data
@@ -186,20 +200,6 @@ function CreateForm(props) {
 
   console.log('formData:>>', formData)
 
-  // const handleEdit = (option) => {
-  //   let _formData = { ...formData }
-  //   let _editValue = [..._formData['product_options'].editValue, option]
-  //   _formData['product_options'].editValue = _editValue
-  //   setFormData(_formData)
-  // }
-
-  // const handleRemoveEdit = (option) => {
-  //   let _formData = { ...formData }
-  //   let _editValue = _formData['product_options'].editValue.filter((_option) => _option !== option)
-  //   _formData['product_options'].editValue = _editValue
-  //   setFormData(_formData)
-  // }
-
   return (
     <Stack vertical alignment="fill">
       <Card sectioned>
@@ -240,17 +240,9 @@ function CreateForm(props) {
         </Stack>
       </Card>
 
-      {/* <Card sectioned>
-        <Stack distribution="fillEvenly">
-          <Variants
-            {...formData['product_options']}
-            handleEdit={handleEdit}
-            handleRemoveEdit={handleRemoveEdit}
-          />
-        </Stack>
-      </Card> */}
-
       <Variants formData={formData} setFormData={setFormData} />
+
+      <ShowMultiple />
 
       <Stack distribution="trailing">
         <Button onClick={onDiscard}>Discard</Button>
