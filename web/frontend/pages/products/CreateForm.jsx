@@ -6,11 +6,8 @@ import ValidateForm from '../../helpers/validateForm'
 import FormControl from '../../components/FormControl'
 import ProductApi from '../../apis/product'
 import Variants from './Variants'
-import { filterValidOptions, generateVariantsFromOptions } from './actions'
-import { updateLineItem } from '@shopify/app-bridge/actions/Cart'
-import VariantApi from '../../apis/variant'
-import ShowMultiple from './showMultiple'
-// import Variants from './[id]/variants'
+import { filterValidOptions } from './actions'
+import Images from './Images'
 
 CreateForm.propTypes = {
   // ...appProps,
@@ -123,7 +120,7 @@ function CreateForm(props) {
           }))
         )
       }
-      _formData.images = created.images
+      _formData.images.originalValue = created.images
     } else {
       /**
        * Sample data
@@ -198,7 +195,7 @@ function CreateForm(props) {
 
   if (!formData) return null
 
-  console.log('formData:>>', formData)
+  // console.log('formData:>>', formData)
 
   return (
     <Stack vertical alignment="fill">
@@ -234,15 +231,12 @@ function CreateForm(props) {
               />
             </Stack.Item>
           </Stack>
-          <Stack>
-            <FormControl {...formData['images']} />
-          </Stack>
         </Stack>
       </Card>
 
-      <Variants formData={formData} setFormData={setFormData} />
+      <Images formData={formData} setFormData={setFormData} />
 
-      <ShowMultiple />
+      <Variants formData={formData} setFormData={setFormData} />
 
       <Stack distribution="trailing">
         <Button onClick={onDiscard}>Discard</Button>

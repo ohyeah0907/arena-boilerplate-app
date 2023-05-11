@@ -18,17 +18,18 @@ function MyDropZoneMultiple(props) {
 
   const [files, setFiles] = useState(props.files || [])
 
-  useEffect(() => onChange(files), [files])
+  useEffect(() => {
+    onChange(files)
+  }, [files])
 
   const handleDropZoneDrop = useCallback((_dropFiles, acceptedFiles, _rejectedFiles) => {
     setFiles((files) => [...files, ...acceptedFiles])
   }, [])
 
-  console.log('Images:>>', files)
-
   const validImageTypes = ['image/gif', 'image/jpeg', 'image/png']
 
-  const fileUpload = !files.length && <DropZone.FileUpload />
+  // const fileUpload = !files.length && <DropZone.FileUpload />
+  const fileUpload = <DropZone.FileUpload />
   const uploadedFiles = files.length > 0 && (
     <div style={{ padding: '0' }}>
       <Stack vertical>
@@ -52,7 +53,7 @@ function MyDropZoneMultiple(props) {
 
   return (
     <DropZone onDrop={handleDropZoneDrop} allowMultiple={true}>
-      {uploadedFiles}
+      {/* {uploadedFiles} */}
       {fileUpload}
     </DropZone>
   )
