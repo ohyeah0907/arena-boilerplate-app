@@ -5,8 +5,9 @@ import AppHeader from '../../components/AppHeader'
 import ValidateForm from '../../helpers/validateForm'
 import FormControl from '../../components/FormControl'
 import ProductApi from '../../apis/product'
+import ImageApi from '../../apis/image'
 import Variants from './Variants'
-import { filterValidOptions } from './actions'
+import { filterValidOptions, generateBase64Image } from './actions'
 import Images from './Images'
 
 CreateForm.propTypes = {
@@ -174,6 +175,7 @@ function CreateForm(props) {
 
       if (created.id) {
         // update
+        data.images = formData.images.originalValue.filter((item) => item.id)
         res = await ProductApi.update(created.id, { product: data })
       } else {
         // create
@@ -181,7 +183,20 @@ function CreateForm(props) {
       }
 
       if (!res.success) throw res.error
+      let _images = formData.images.originalValue.filter((item) => !item.id)
 
+      if (_images.length > 0) {
+        _images.map(async (_item) => {
+          if (_item.name) {
+            const param = await generateBase64Image(_item)
+            let _param = param.split(',')
+
+            await ImageApi.create(res.data.product.id, { image: { attachment: _param[1] } })
+          } else {
+            await ImageApi.create(res.data.product.id, { image: _item })
+          }
+        })
+      }
       actions.showNotify({ message: created.id ? 'Saved' : 'Created' })
 
       onSubmited(res.data.product)

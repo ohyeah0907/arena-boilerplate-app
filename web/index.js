@@ -46,7 +46,10 @@ app.use('/api/*', shopify.validateAuthenticatedSession(), verifyToken)
 app.use(cors())
 app.use(morgan('tiny'))
 
-app.use(express.json())
+// app.use(express.json())
+
+app.use(express.urlencoded({ extended: true, limit: '10240kb' }))
+app.use(express.json({ limit: '10240kb' }))
 
 adminRoute(app)
 

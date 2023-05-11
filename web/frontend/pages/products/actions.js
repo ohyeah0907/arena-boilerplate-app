@@ -75,14 +75,11 @@ export const getSameVariants = (variants1, variants2) => {
   return result.length > 0
 }
 
-function generateBase64Image(file) {
-  var reader = new FileReader()
-  reader.readAsDataURL(file)
-  reader.onload = function () {
-    var base64Image = reader.result
-    console.log(base64Image)
-  }
-  reader.onerror = function (error) {
-    console.log('Error: ', error)
-  }
+export function generateBase64Image(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.readAsDataURL(file)
+    reader.onload = () => resolve(reader.result)
+    reader.onerror = (error) => reject(error)
+  })
 }

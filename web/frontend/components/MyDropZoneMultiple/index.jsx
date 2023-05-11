@@ -20,11 +20,24 @@ function MyDropZoneMultiple(props) {
 
   useEffect(() => {
     onChange(files)
+    // files.map(async (item) => {
+    //   let param = await generateBase64Image(item)
+    //   console.log('param', param)
+    // })
   }, [files])
 
   const handleDropZoneDrop = useCallback((_dropFiles, acceptedFiles, _rejectedFiles) => {
     setFiles((files) => [...files, ...acceptedFiles])
   }, [])
+
+  // function generateBase64Image(file) {
+  //   return new Promise((resolve, reject) => {
+  //     const reader = new FileReader()
+  //     reader.readAsDataURL(file)
+  //     reader.onload = () => resolve(reader.result)
+  //     reader.onerror = (error) => reject(error)
+  //   })
+  // }
 
   const validImageTypes = ['image/gif', 'image/jpeg', 'image/png']
 

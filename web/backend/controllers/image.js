@@ -21,6 +21,7 @@ export default {
     try {
       const { shop, accessToken } = getCurrentSession(req, res)
       const { idProduct } = req.params
+      console.log('data:>>', req.body)
 
       const data = await Image.create({ shop, accessToken, data: req.body, idProduct })
 
