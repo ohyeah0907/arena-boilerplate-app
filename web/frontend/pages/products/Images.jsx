@@ -19,8 +19,6 @@ function Images(props) {
   const [showAddImageForm, setShowAddImageForm] = useState(false)
   const [urlImage, setUrlImage] = useState('')
 
-  console.log('formData Images:>>', formData)
-
   return (
     <AlphaCard>
       <LegacyStack>
@@ -42,7 +40,6 @@ function Images(props) {
                 )
 
                 _formData['images'].originalValue = result
-                _formData['images'].removeValue = []
                 setFormData(_formData)
               }}
             >

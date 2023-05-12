@@ -98,7 +98,9 @@ function CreateForm(props) {
 
   const [formData, setFormData] = useState(null)
 
-  useEffect(() => console.log('formData', formData), [formData])
+  useEffect(() => {
+    console.log('formData', formData)
+  }, [formData])
 
   useEffect(() => {
     let _formData = JSON.parse(JSON.stringify(InitFormData))
@@ -148,6 +150,7 @@ function CreateForm(props) {
 
   const handleSubmit = async () => {
     try {
+      let _formData = { ...formData }
       const { formValid, validFormData } = ValidateForm.validateForm(formData)
 
       if (!formValid) {
@@ -175,7 +178,7 @@ function CreateForm(props) {
 
       if (created.id) {
         // update
-        data.images = formData.images.originalValue.filter((item) => item.id)
+        // data.images = formData.images.originalValue.filter((item) => item.id)
         res = await ProductApi.update(created.id, { product: data })
       } else {
         // create
@@ -184,19 +187,32 @@ function CreateForm(props) {
 
       if (!res.success) throw res.error
       let _images = formData.images.originalValue.filter((item) => !item.id)
+      let _res = null
 
       if (_images.length > 0) {
-        _images.map(async (_item) => {
+        for (let _item of _images) {
           if (_item.name) {
             const param = await generateBase64Image(_item)
             let _param = param.split(',')
 
-            await ImageApi.create(res.data.product.id, { image: { attachment: _param[1] } })
+            _res = await ImageApi.create(res.data.product.id, { image: { attachment: _param[1] } })
           } else {
-            await ImageApi.create(res.data.product.id, { image: _item })
+            _res = await ImageApi.create(res.data.product.id, { image: _item })
           }
-        })
+        }
       }
+      let _removeImages = formData['images'].removeValue.filter((item) => item.id)
+      if (_removeImages.length > 0) {
+        for (let _item of _removeImages) {
+          _res = await ImageApi.delete(res.data.product.id, _item.id)
+        }
+      }
+      _formData['images'].removeValue = []
+      _res = await ProductApi.findById(res.data.product.id)
+      _formData['images'].originalValue = _res.data.product.images
+
+      setFormData(_formData)
+
       actions.showNotify({ message: created.id ? 'Saved' : 'Created' })
 
       onSubmited(res.data.product)
