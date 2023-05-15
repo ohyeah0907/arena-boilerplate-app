@@ -47,10 +47,221 @@ const getProductVendors = async ({ shop, accessToken }) => {
     accessToken,
     query,
   })
-
+  console.log('productVendors :>> ', res)
   return res.shop['productVendors'].edges.map((item) => item.node)
 }
 
+const findGraphQL = async ({
+  shop,
+  accessToken,
+  limit = 20,
+  pageInfo = '',
+  order = false,
+  title = '',
+  hasPreviousPage = false,
+  hasNextPage = false,
+}) => {
+  let variables = {
+    limit,
+    order,
+    title: `title: ${title}`,
+    pageInfo,
+  }
+  let page = ``
+  if (pageInfo) {
+    page = hasNextPage
+      ? `first: $limit, after: $pageInfo`
+      : hasPreviousPage
+      ? `last: $limit, before: $pageInfo`
+      : `first: $limit`
+  } else {
+    page = `first: $limit`
+  }
+
+  let query = `query products ($limit: Int!, $order: Boolean, $title: String ${
+    pageInfo ? ', $pageInfo: String' : ''
+  }) {
+    products(${page}, reverse: $order, query: $title) {
+      edges {
+        node {
+          id 
+          title
+          handle
+          status
+          description
+          options {
+            id
+            name
+            position
+            values
+          }
+          variants(first: 10) {
+            edges {
+              node{
+                id
+                title
+                price
+                compareAtPrice
+                selectedOptions {
+                  name
+                  value
+                }
+              }
+            }
+          } 
+          images(first: 10) {
+            edges {
+              node {
+                id
+                url
+              }
+            }
+          }
+        }
+      }
+      pageInfo {
+        endCursor
+        hasNextPage
+        hasPreviousPage
+        startCursor
+      }
+    }
+
+  }`
+  console.log('query :>> ', query)
+  let res = await graphqlCaller({
+    shop,
+    accessToken,
+    query,
+    variables,
+  })
+  return res
+}
+
+const findByIdGraphQL = async ({ shop, accessToken, id }) => {
+  let variables = {
+    id: `gid://shopify/Product/${id}`,
+  }
+  let query = `query product ($id: ID!){
+      product(id: $id) {
+        id 
+        title
+        handle
+        status
+        description
+        options {
+          id 
+          name
+          position
+          values
+        }
+        variants(first: 10) {
+          edges {
+            node{
+              id
+              title
+              price
+              compareAtPrice
+              selectedOptions {
+                name
+                value
+              }
+            }
+          }
+        } 
+        images(first: 10) {
+          edges {
+            node {
+              id
+              url
+            }
+          }
+        }
+      }
+    }`
+  let res = await graphqlCaller({
+    shop,
+    accessToken,
+    query,
+    variables,
+  })
+  return res
+}
+
+const updateGraphQL = async ({ shop, accessToken, id, data }) => {
+  let _data = {
+    // ...data,
+    id: `gid://shopify/Product/${id}`,
+    title: data.product['title'],
+    bodyHtml: data.product['description'],
+    status: data.product['status'].toUpperCase(),
+    options: data.product['options'].map((value) => value.name),
+    variants: data.product['variants'].map((value) => {
+      let _variant = {}
+      Array.from(['price', 'compareAtPrice']).forEach((key) => {
+        _variant[key] = value[key]
+      })
+      _variant['options'] = value.selectedOptions.map((value) => value.value)
+      return _variant
+    }),
+  }
+  console.log('data :>> ', _data.status)
+  let variables = {
+    input: _data,
+  }
+
+  let query = `mutation productUpdate($input: ProductInput!) {
+    productUpdate(input: $input) {
+      product {
+        id
+        title
+        handle
+        status
+        description
+        options {
+          id
+          name
+          position
+          values
+        }
+        variants(first: 10) {
+          edges {
+            node{
+              id
+              title
+              price
+              compareAtPrice
+              selectedOptions {
+                name
+                value
+              }
+            }
+          }
+        } 
+        images(first: 10) {
+          edges {
+            node {
+              id
+              url
+            }
+          }
+        }
+      }
+      userErrors {
+        field
+        message
+      }
+    }
+  }`
+
+  let res = await graphqlCaller({
+    shop,
+    accessToken,
+    query,
+    variables,
+  })
+  return res
+}
 const getAll = async ({ shop, accessToken, count }) => {
   let items = []
   let res = null
@@ -137,6 +348,9 @@ const _delete = async ({ shop, accessToken, id }) => {
 const Product = {
   getProductTypes,
   getProductVendors,
+  findGraphQL,
+  updateGraphQL,
+  findByIdGraphQL,
   getAll,
   count,
   find,

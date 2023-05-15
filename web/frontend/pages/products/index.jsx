@@ -25,7 +25,9 @@ function ProductsPage(props) {
       actions.showNotify({ message: error.message, error: true })
     }
   }
-
+  useEffect(() => {
+    console.log(products)
+  }, [products])
   useEffect(() => {
     getProductsCount()
   }, [])
@@ -35,8 +37,24 @@ function ProductsPage(props) {
       setProducts(null)
 
       let res = await ProductApi.find(query)
-      if (!res.success) throw res.error
+      console.log('res:>>', res)
+      const { edges, pageInfo } = res.data.products
+      let _products = edges.map((value) => {
+        const images = value.node.images.edges.map((value) => value.node)
+        const variants = value.node.variants.edges.map((value) => value.node)
+        const id = value.node.id.substring(value.node.id.lastIndexOf('/') + 1, value.node.id.length)
+        const product = {
+          ...value.node,
+          id,
+          images,
+          variants,
+        }
+        return product
+      })
+      let _pageInfo = pageInfo
 
+      res.data = { products: _products, pageInfo: _pageInfo }
+      if (!res.success) throw res.error
       setProducts(res.data)
     } catch (error) {
       console.log(error)
@@ -97,10 +115,22 @@ function ProductsPage(props) {
       {products?.products?.length > 0 && (
         <Stack distribution="center">
           <Pagination
-            hasPrevious={products.pageInfo.hasPrevious}
-            onPrevious={() => setSearchParams({ pageInfo: products.pageInfo.previousPageInfo })}
-            hasNext={products.pageInfo.hasNext}
-            onNext={() => setSearchParams({ pageInfo: products.pageInfo.nextPageInfo })}
+            hasPrevious={products.pageInfo.hasPreviousPage}
+            onPrevious={() => {
+              let query = {
+                pageInfo: products.pageInfo.startCursor || '',
+                hasPreviousPage: true,
+              }
+              setSearchParams({ ...query })
+            }}
+            hasNext={products.pageInfo.hasNextPage}
+            onNext={() => {
+              let query = {
+                pageInfo: products.pageInfo.endCursor || '',
+                hasNextPage: true,
+              }
+              setSearchParams({ ...query })
+            }}
           />
         </Stack>
       )}

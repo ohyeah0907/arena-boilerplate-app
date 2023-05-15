@@ -8,7 +8,7 @@ import { useParams } from 'react-router-dom'
 
 function DetailPage(props) {
   let { id } = useParams()
-
+  const { actions } = props
   const [product, setProduct] = useState(null)
 
   useEffect(() => console.log('product:>>', product), [product])
@@ -16,9 +16,19 @@ function DetailPage(props) {
   const getProduct = async (id) => {
     try {
       let res = await ProductApi.findById(id)
+      let _product = { ...res.data.product }
+      Array.from(['images', 'variants']).forEach((key) => {
+        _product[key] = res.data.product[key].edges.map((value) => value.node)
+      })
+      Array.from(['id']).forEach((key) => {
+        _product[key] = res.data.product[key].substring(
+          res.data.product[key].lastIndexOf('/') + 1,
+          res.data.product[key].length
+        )
+      })
       if (!res.success) throw res.error
 
-      setProduct(res.data.product)
+      setProduct(_product)
     } catch (error) {
       actions.showNotify({ message: error.message, error: true })
     }

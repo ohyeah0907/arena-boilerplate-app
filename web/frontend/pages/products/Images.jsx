@@ -98,7 +98,7 @@ function Images(props) {
                   border: 'dashed gray',
                   borderWidth: '1px',
                 }}
-                src={item.src ? item.src : window.URL.createObjectURL(item)}
+                src={item.url ? item.url : window.URL.createObjectURL(item)}
               />
             </div>
           ))}

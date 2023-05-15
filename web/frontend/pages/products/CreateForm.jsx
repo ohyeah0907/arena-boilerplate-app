@@ -38,7 +38,7 @@ const InitFormData = {
     },
     focused: true,
   },
-  body_html: {
+  description: {
     type: 'text',
     label: 'Description',
     value: '',
@@ -106,7 +106,7 @@ function CreateForm(props) {
     let _formData = JSON.parse(JSON.stringify(InitFormData))
 
     if (created.id) {
-      Array.from(['title', 'body_html', 'status', 'vendor', 'product_type']).map(
+      Array.from(['title', 'description', 'status', 'vendor', 'product_type', 'status']).map(
         (key) => (_formData[key] = { ..._formData[key], value: created[key] || '' })
       )
       _formData.options = {
@@ -129,7 +129,7 @@ function CreateForm(props) {
        * Sample data
        */
       _formData.title.value = `Sample product - ${new Date().toString()}`
-      _formData.body_html.value = `Sample product`
+      _formData.description.value = `Sample product`
     }
 
     setFormData(_formData)
@@ -162,9 +162,10 @@ function CreateForm(props) {
 
       let data = {
         title: validFormData.title.value,
-        body_html: validFormData.body_html.value,
+        description: validFormData.description.value,
         vendor: validFormData.vendor.value,
         product_type: validFormData.product_type.value,
+        status: validFormData.status.value,
       }
 
       let options = filterValidOptions(formData.options.value)
@@ -186,30 +187,30 @@ function CreateForm(props) {
       }
 
       if (!res.success) throw res.error
-      let _images = formData.images.originalValue.filter((item) => !item.id)
-      let _res = null
+      // let _images = formData.images.originalValue.filter((item) => !item.id)
+      // let _res = null
 
-      if (_images.length > 0) {
-        for (let _item of _images) {
-          if (_item.name) {
-            const param = await generateBase64Image(_item)
-            let _param = param.split(',')
+      // if (_images.length > 0) {
+      //   for (let _item of _images) {
+      //     if (_item.name) {
+      //       const param = await generateBase64Image(_item)
+      //       let _param = param.split(',')
 
-            _res = await ImageApi.create(res.data.product.id, { image: { attachment: _param[1] } })
-          } else {
-            _res = await ImageApi.create(res.data.product.id, { image: _item })
-          }
-        }
-      }
-      let _removeImages = formData['images'].removeValue.filter((item) => item.id)
-      if (_removeImages.length > 0) {
-        for (let _item of _removeImages) {
-          _res = await ImageApi.delete(res.data.product.id, _item.id)
-        }
-      }
-      _formData['images'].removeValue = []
-      _res = await ProductApi.findById(res.data.product.id)
-      _formData['images'].originalValue = _res.data.product.images
+      //       _res = await ImageApi.create(res.data.product.id, { image: { attachment: _param[1] } })
+      //     } else {
+      //       _res = await ImageApi.create(res.data.product.id, { image: _item })
+      //     }
+      //   }
+      // }
+      // let _removeImages = formData['images'].removeValue.filter((item) => item.id)
+      // if (_removeImages.length > 0) {
+      //   for (let _item of _removeImages) {
+      //     _res = await ImageApi.delete(res.data.product.id, _item.id)
+      //   }
+      // }
+      // _formData['images'].removeValue = []
+      // _res = await ProductApi.findById(res.data.product.id)
+      // _formData['images'].originalValue = _res.data.product.images
 
       setFormData(_formData)
 
@@ -234,8 +235,8 @@ function CreateForm(props) {
         <Stack vertical alignment="fill">
           <FormControl {...formData['title']} onChange={(value) => handleChange('title', value)} />
           <FormControl
-            {...formData['body_html']}
-            onChange={(value) => handleChange('body_html', value)}
+            {...formData['description']}
+            onChange={(value) => handleChange('description', value)}
           />
           <Stack distribution="fillEvenly">
             <Stack.Item fill>

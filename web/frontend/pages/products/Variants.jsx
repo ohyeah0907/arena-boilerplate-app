@@ -80,10 +80,10 @@ function Variants(props) {
               />,
               <TextField
                 prefix="$"
-                value={item.compare_at_price || ''}
+                value={item.compareAtPrice || ''}
                 onChange={(value) => {
                   let _formData = { ...formData }
-                  _formData.options.variants[index].compare_at_price = value
+                  _formData.options.variants[index].compareAtPrice = value
                   setFormData(_formData)
                 }}
               />,
