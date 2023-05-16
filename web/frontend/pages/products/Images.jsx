@@ -135,7 +135,7 @@ function Images(props) {
                 let _formData = { ...formData }
                 _formData['images'].originalValue = [
                   ...formData['images'].originalValue,
-                  { src: urlImage },
+                  { url: urlImage },
                 ]
 
                 setFormData(_formData)

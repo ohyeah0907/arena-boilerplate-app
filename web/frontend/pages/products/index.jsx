@@ -18,7 +18,6 @@ function ProductsPage(props) {
     try {
       let res = await ProductApi.count()
       if (!res.success) throw res.error
-
       setCount(res.data.count)
     } catch (error) {
       console.log(error)

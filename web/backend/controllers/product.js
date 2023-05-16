@@ -27,18 +27,6 @@ export default {
     }
   },
 
-  count: async (req, res) => {
-    try {
-      const { shop, accessToken } = getCurrentSession(req, res)
-
-      const data = await Product.count({ shop, accessToken })
-
-      return ResponseHandler.success(res, data)
-    } catch (error) {
-      return ResponseHandler.error(res, error)
-    }
-  },
-
   findGraphQL: async (req, res) => {
     try {
       const { shop, accessToken } = getCurrentSession(req, res)
@@ -50,17 +38,6 @@ export default {
       return ResponseHandler.error(res, error)
     }
   },
-  // find: async (req, res) => {
-  //   try {
-  //     const { shop, accessToken } = getCurrentSession(req, res)
-
-  //     const data = await Product.find({ ...req.query, shop, accessToken })
-
-  //     return ResponseHandler.success(res, data)
-  //   } catch (error) {
-  //     return ResponseHandler.error(res, error)
-  //   }
-  // },
 
   findByIdGraphQL: async (req, res) => {
     try {
@@ -69,31 +46,6 @@ export default {
       const { id } = req.params
 
       const data = await Product.findByIdGraphQL({ shop, accessToken, id })
-
-      return ResponseHandler.success(res, data)
-    } catch (error) {
-      return ResponseHandler.error(res, error)
-    }
-  },
-  // findById: async (req, res) => {
-  //   try {
-  //     const { shop, accessToken } = getCurrentSession(req, res)
-
-  //     const { id } = req.params
-
-  //     const data = await Product.findById({ shop, accessToken, id })
-
-  //     return ResponseHandler.success(res, data)
-  //   } catch (error) {
-  //     return ResponseHandler.error(res, error)
-  //   }
-  // },
-
-  create: async (req, res) => {
-    try {
-      const { shop, accessToken } = getCurrentSession(req, res)
-
-      const data = await Product.create({ shop, accessToken, data: req.body })
 
       return ResponseHandler.success(res, data)
     } catch (error) {
@@ -119,24 +71,105 @@ export default {
     }
   },
 
-  // update: async (req, res) => {
-  //   try {
-  //     const { shop, accessToken } = getCurrentSession(req, res)
+  createGraphQL: async (req, res) => {
+    try {
+      const { shop, accessToken } = getCurrentSession(req, res)
+      const data = await Product.createGraphQL({
+        shop,
+        accessToken,
+        data: req.body,
+      })
+      ResponseHandler.success(res, data)
+    } catch (error) {
+      return ResponseHandler.error(res, error)
+    }
+  },
 
-  //     const { id } = req.params
+  deleteGraphQL: async (req, res) => {
+    try {
+      const { shop, accessToken } = getCurrentSession(req, res)
 
-  //     const data = await Product.update({
-  //       shop,
-  //       accessToken,
-  //       id,
-  //       data: req.body,
-  //     })
+      const { id } = req.params
 
-  //     return ResponseHandler.success(res, data)
-  //   } catch (error) {
-  //     return ResponseHandler.error(res, error)
-  //   }
-  // },
+      const data = await Product.deleteGraphQL({
+        shop,
+        accessToken,
+        id,
+      })
+      ResponseHandler.success(res, data)
+    } catch (error) {
+      return ResponseHandler.error(res, error)
+    }
+  },
+
+  count: async (req, res) => {
+    try {
+      const { shop, accessToken } = getCurrentSession(req, res)
+
+      const data = await Product.count({ shop, accessToken })
+
+      return ResponseHandler.success(res, data)
+    } catch (error) {
+      return ResponseHandler.error(res, error)
+    }
+  },
+
+  find: async (req, res) => {
+    try {
+      const { shop, accessToken } = getCurrentSession(req, res)
+
+      const data = await Product.find({ ...req.query, shop, accessToken })
+
+      return ResponseHandler.success(res, data)
+    } catch (error) {
+      return ResponseHandler.error(res, error)
+    }
+  },
+
+  findById: async (req, res) => {
+    try {
+      const { shop, accessToken } = getCurrentSession(req, res)
+
+      const { id } = req.params
+
+      const data = await Product.findById({ shop, accessToken, id })
+
+      return ResponseHandler.success(res, data)
+    } catch (error) {
+      return ResponseHandler.error(res, error)
+    }
+  },
+
+  create: async (req, res) => {
+    try {
+      const { shop, accessToken } = getCurrentSession(req, res)
+
+      const data = await Product.create({ shop, accessToken, data: req.body })
+
+      return ResponseHandler.success(res, data)
+    } catch (error) {
+      return ResponseHandler.error(res, error)
+    }
+  },
+
+  update: async (req, res) => {
+    try {
+      const { shop, accessToken } = getCurrentSession(req, res)
+
+      const { id } = req.params
+
+      const data = await Product.update({
+        shop,
+        accessToken,
+        id,
+        data: req.body,
+      })
+
+      return ResponseHandler.success(res, data)
+    } catch (error) {
+      return ResponseHandler.error(res, error)
+    }
+  },
 
   delete: async (req, res) => {
     try {
