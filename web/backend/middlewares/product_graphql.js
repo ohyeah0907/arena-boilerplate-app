@@ -188,7 +188,6 @@ const findById = async ({ shop, accessToken, id }) => {
 }
 
 const update = async ({ shop, accessToken, id, data }) => {
-  console.log(data.product['images'])
   const _data = {
     id: `gid://shopify/Product/${id}`,
     title: data.product['title'],

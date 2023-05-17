@@ -179,7 +179,7 @@ function CreateForm(props) {
       let id = created.id
       if (created.id) {
         // update
-        data.images = formData.images.originalValue.filter((item) => item.id)
+        // data.images = formData.images.originalValue.filter((item) => item.id)
         res = await ProductGraphQLApi.update(created.id, { product: data })
       } else {
         // create
@@ -232,10 +232,12 @@ function CreateForm(props) {
         let urls = _images.filter((item) => item.url)
         if (urls.length > 0) {
           let media = urls.map((item) => ({
-            alt: 'external image url',
+            alt: item.url,
             resourceUrl: item.url,
           }))
           let __res = await ImageGraphQLApi.create(id, media)
+
+          console.log('__res :>> ', __res)
         }
       }
 

@@ -43,11 +43,15 @@ function DetailPage(props) {
       <AppHeader
         {...props}
         title={product?.title || 'loading..'}
-        onBack={() => props.navigate(`/products`)}
+        onBack={() => props.navigate(`/products-graphql`)}
       />
 
       {product ? (
-        <CreateForm {...props} created={product} onDiscard={() => props.navigate(`products`)} />
+        <CreateForm
+          {...props}
+          created={product}
+          onDiscard={() => props.navigate(`products-graphql`)}
+        />
       ) : (
         <SkeletonPage />
       )}

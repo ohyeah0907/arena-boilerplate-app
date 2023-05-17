@@ -92,7 +92,7 @@ function ProductsPage(props) {
         primaryActions={[
           {
             label: 'Add product',
-            onClick: () => props.navigate('products/new'),
+            onClick: () => props.navigate('products-graphql/new'),
             primary: true,
           },
         ]}
@@ -107,7 +107,7 @@ function ProductsPage(props) {
         <Table
           {...props}
           items={products?.products}
-          onEdit={(item) => props.navigate(`products/${item.id}`)}
+          onEdit={(item) => props.navigate(`products-graphql/${item.id}`)}
           onDelete={(item) => setDeleted(item)}
         />
       </Card>
