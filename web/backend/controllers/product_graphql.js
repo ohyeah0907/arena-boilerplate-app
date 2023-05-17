@@ -1,6 +1,6 @@
 import getCurrentSession from '../../auth/getCurrentSession.js'
 import ResponseHandler from '../helpers/responseHandler.js'
-import Product from '../middlewares/product.js'
+import Product from '../middlewares/product_graphql.js'
 
 export default {
   getProductTypes: async (req, res) => {
@@ -20,18 +20,6 @@ export default {
       const { shop, accessToken } = getCurrentSession(req, res)
 
       const data = await Product.getProductVendors({ shop, accessToken })
-
-      return ResponseHandler.success(res, data)
-    } catch (error) {
-      return ResponseHandler.error(res, error)
-    }
-  },
-
-  count: async (req, res) => {
-    try {
-      const { shop, accessToken } = getCurrentSession(req, res)
-
-      const data = await Product.count({ shop, accessToken })
 
       return ResponseHandler.success(res, data)
     } catch (error) {
@@ -65,18 +53,6 @@ export default {
     }
   },
 
-  create: async (req, res) => {
-    try {
-      const { shop, accessToken } = getCurrentSession(req, res)
-
-      const data = await Product.create({ shop, accessToken, data: req.body })
-
-      return ResponseHandler.success(res, data)
-    } catch (error) {
-      return ResponseHandler.error(res, error)
-    }
-  },
-
   update: async (req, res) => {
     try {
       const { shop, accessToken } = getCurrentSession(req, res)
@@ -89,8 +65,21 @@ export default {
         id,
         data: req.body,
       })
-
       return ResponseHandler.success(res, data)
+    } catch (error) {
+      return ResponseHandler.error(res, error)
+    }
+  },
+
+  create: async (req, res) => {
+    try {
+      const { shop, accessToken } = getCurrentSession(req, res)
+      const data = await Product.create({
+        shop,
+        accessToken,
+        data: req.body,
+      })
+      ResponseHandler.success(res, data)
     } catch (error) {
       return ResponseHandler.error(res, error)
     }
@@ -102,9 +91,12 @@ export default {
 
       const { id } = req.params
 
-      const data = await Product.delete({ shop, accessToken, id })
-
-      return ResponseHandler.success(res, data)
+      const data = await Product.delete({
+        shop,
+        accessToken,
+        id,
+      })
+      ResponseHandler.success(res, data)
     } catch (error) {
       return ResponseHandler.error(res, error)
     }

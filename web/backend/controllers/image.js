@@ -3,44 +3,6 @@ import ResponseHandler from '../helpers/responseHandler.js'
 import Image from '../middlewares/image.js'
 
 export default {
-  createGraphQL: async (req, res) => {
-    try {
-      const { shop, accessToken } = getCurrentSession(req, res)
-      const { idProduct } = req.params
-
-      console.log('idProduct :>> ', idProduct)
-
-      const stagedTargetes = await Image.createGraphQL({
-        shop,
-        accessToken,
-        idProduct,
-        data: req.body,
-      })
-
-      return ResponseHandler.success(res, stagedTargetes)
-    } catch (error) {
-      return ResponseHandler.error(res, error)
-    }
-  },
-
-  uploadImageGraphQL: async (req, res) => {
-    try {
-      const { shop, accessToken } = getCurrentSession(req, res)
-
-      console.log('req.body :>> ', req.body)
-
-      const data = await Image.stagedUploadsCreate({
-        shop,
-        accessToken,
-        data: req.body,
-      })
-
-      return ResponseHandler.success(res, data)
-    } catch (error) {
-      return ResponseHandler.error(res, error)
-    }
-  },
-
   findById: async (req, res) => {
     try {
       const { shop, accessToken } = getCurrentSession(req, res)

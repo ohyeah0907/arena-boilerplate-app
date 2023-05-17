@@ -1,11 +1,12 @@
 import { Card, Pagination, Stack } from '@shopify/polaris'
 import { useEffect, useState } from 'react'
-import ProductApi from '../../apis/product'
 import AppHeader from '../../components/AppHeader'
 import { ImagesMajor, EditMinor, DeleteMinor, ViewMinor } from '@shopify/polaris-icons'
 import Table from './Table'
 import { useSearchParams } from 'react-router-dom'
 import ConfirmModal from '../../components/ConfirmModal'
+import ProductGraphQLApi from '../../apis/product_graphql'
+import ProductApi from '../../apis/product'
 
 function ProductsPage(props) {
   const { actions, location } = props
@@ -18,14 +19,15 @@ function ProductsPage(props) {
     try {
       let res = await ProductApi.count()
       if (!res.success) throw res.error
-
       setCount(res.data.count)
     } catch (error) {
       console.log(error)
       actions.showNotify({ message: error.message, error: true })
     }
   }
-
+  useEffect(() => {
+    console.log(products)
+  }, [products])
   useEffect(() => {
     getProductsCount()
   }, [])
@@ -34,9 +36,25 @@ function ProductsPage(props) {
     try {
       setProducts(null)
 
-      let res = await ProductApi.find(query)
-      if (!res.success) throw res.error
+      let res = await ProductGraphQLApi.find(query)
+      console.log('res:>>', res)
+      const { edges, pageInfo } = res.data.products
+      let _products = edges.map((value) => {
+        const images = value.node.images.edges.map((value) => value.node)
+        const variants = value.node.variants.edges.map((value) => value.node)
+        const id = value.node.id.substring(value.node.id.lastIndexOf('/') + 1, value.node.id.length)
+        const product = {
+          ...value.node,
+          id,
+          images,
+          variants,
+        }
+        return product
+      })
+      let _pageInfo = pageInfo
 
+      res.data = { products: _products, pageInfo: _pageInfo }
+      if (!res.success) throw res.error
       setProducts(res.data)
     } catch (error) {
       console.log(error)
@@ -52,7 +70,7 @@ function ProductsPage(props) {
     try {
       actions.showAppLoading()
 
-      let res = await ProductApi.delete(selected.id)
+      let res = await ProductGraphQLApi.delete(selected.id)
       if (!res.success) throw res.error
 
       actions.showNotify({ message: 'Deleted' })
@@ -97,10 +115,22 @@ function ProductsPage(props) {
       {products?.products?.length > 0 && (
         <Stack distribution="center">
           <Pagination
-            hasPrevious={products.pageInfo.hasPrevious}
-            onPrevious={() => setSearchParams({ pageInfo: products.pageInfo.previousPageInfo })}
-            hasNext={products.pageInfo.hasNext}
-            onNext={() => setSearchParams({ pageInfo: products.pageInfo.nextPageInfo })}
+            hasPrevious={products.pageInfo.hasPreviousPage}
+            onPrevious={() => {
+              let query = {
+                pageInfo: products.pageInfo.startCursor || '',
+                hasPreviousPage: true,
+              }
+              setSearchParams({ ...query })
+            }}
+            hasNext={products.pageInfo.hasNextPage}
+            onNext={() => {
+              let query = {
+                pageInfo: products.pageInfo.endCursor || '',
+                hasNextPage: true,
+              }
+              setSearchParams({ ...query })
+            }}
           />
         </Stack>
       )}

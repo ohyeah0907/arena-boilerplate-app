@@ -19,6 +19,7 @@ Table.defaultProps = {
 function Table(props) {
   const { items, onEdit, onDelete } = props
 
+  console.log('items :>> ', items)
   const [selected, setSelected] = useState(null)
 
   let rows = []
@@ -28,7 +29,7 @@ function Table(props) {
       <div style={{ maxWidth: 300, whiteSpace: 'normal' }}>
         <Stack spacing="tight" wrap={false}>
           <Stack.Item>
-            <Thumbnail source={item.image?.src || ImagesMajor} size="small" alt={item.title} />
+            <Thumbnail source={item.images[0]?.url || ImagesMajor} size="small" alt={item.title} />
           </Stack.Item>
           <Stack.Item>
             <h3>

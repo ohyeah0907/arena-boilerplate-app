@@ -4,11 +4,11 @@ import { useEffect, useState } from 'react'
 import AppHeader from '../../components/AppHeader'
 import ValidateForm from '../../helpers/validateForm'
 import FormControl from '../../components/FormControl'
-import ProductApi from '../../apis/product'
-import ImageApi from '../../apis/image'
 import Variants from './Variants'
-import { filterValidOptions, generateBase64Image } from './actions'
+import { filterValidOptions } from './actions'
 import Images from './Images'
+import ProductGraphQLApi from '../../apis/product_graphql'
+import ImageGraphQLApi from '../../apis/image_graphql'
 
 CreateForm.propTypes = {
   // ...appProps,
@@ -38,7 +38,7 @@ const InitFormData = {
     },
     focused: true,
   },
-  body_html: {
+  description: {
     type: 'text',
     label: 'Description',
     value: '',
@@ -106,7 +106,7 @@ function CreateForm(props) {
     let _formData = JSON.parse(JSON.stringify(InitFormData))
 
     if (created.id) {
-      Array.from(['title', 'body_html', 'status', 'vendor', 'product_type']).map(
+      Array.from(['title', 'description', 'status', 'vendor', 'product_type', 'status']).map(
         (key) => (_formData[key] = { ..._formData[key], value: created[key] || '' })
       )
       _formData.options = {
@@ -129,7 +129,7 @@ function CreateForm(props) {
        * Sample data
        */
       _formData.title.value = `Sample product - ${new Date().toString()}`
-      _formData.body_html.value = `Sample product`
+      _formData.description.value = `Sample product`
     }
 
     setFormData(_formData)
@@ -162,9 +162,10 @@ function CreateForm(props) {
 
       let data = {
         title: validFormData.title.value,
-        body_html: validFormData.body_html.value,
+        description: validFormData.description.value,
         vendor: validFormData.vendor.value,
         product_type: validFormData.product_type.value,
+        status: validFormData.status.value,
       }
 
       let options = filterValidOptions(formData.options.value)
@@ -175,47 +176,86 @@ function CreateForm(props) {
       console.log('data:>>', data)
 
       let res = null
-
+      let id = created.id
       if (created.id) {
         // update
-        // data.images = formData.images.originalValue.filter((item) => item.id)
-        res = await ProductApi.update(created.id, { product: data })
+        data.images = formData.images.originalValue.filter((item) => item.id)
+        res = await ProductGraphQLApi.update(created.id, { product: data })
       } else {
         // create
-        res = await ProductApi.create({ product: data })
+        res = await ProductGraphQLApi.create({ product: data })
+        const { id: _id } = res.data.productCreate.product
+        id = _id.substring(_id.lastIndexOf('/', _id.length))
       }
+
+      console.log('res :>> ', res)
 
       if (!res.success) throw res.error
       let _images = formData.images.originalValue.filter((item) => !item.id)
       let _res = null
-
       if (_images.length > 0) {
-        for (let _item of _images) {
-          if (_item.name) {
-            const param = await generateBase64Image(_item)
-            let _param = param.split(',')
+        let files = _images.filter((item) => item.name)
 
-            _res = await ImageApi.create(res.data.product.id, { image: { attachment: _param[1] } })
-          } else {
-            _res = await ImageApi.create(res.data.product.id, { image: _item })
+        if (files.length > 0) {
+          let _files = [...files].map((item) => ({
+            size: item.size,
+            name: item.name,
+            type: item.type,
+          }))
+          _res = await ImageGraphQLApi.upload(_files)
+
+          // Upload image to shopify
+          for (let i = 0; i < files.length; i++) {
+            let formData = new FormData()
+            for (const param of _res.data.stagedUploadsCreate.stagedTargets[i].parameters) {
+              formData.append(param.name, param.value)
+            }
+            formData.append('file', files[i])
+            await fetch(_res.data.stagedUploadsCreate.stagedTargets[i].url, {
+              method: 'POST',
+              body: formData,
+            })
           }
+          // Upload image to a product
+          let media = _res.data.stagedUploadsCreate.stagedTargets.map((item) => ({
+            alt: item.resourceUrl.substring(
+              item.resourceUrl.lastIndexOf('/') + 1,
+              item.resourceUrl.length
+            ),
+            resourceUrl: item.resourceUrl,
+          }))
+          let __res = await ImageGraphQLApi.create(id, media)
+
+          console.log('__res :>> ', __res)
+        }
+
+        let urls = _images.filter((item) => item.url)
+        if (urls.length > 0) {
+          let media = urls.map((item) => ({
+            alt: 'external image url',
+            resourceUrl: item.url,
+          }))
+          let __res = await ImageGraphQLApi.create(id, media)
         }
       }
+
       let _removeImages = formData['images'].removeValue.filter((item) => item.id)
       if (_removeImages.length > 0) {
         for (let _item of _removeImages) {
-          _res = await ImageApi.delete(res.data.product.id, _item.id)
+          _res = await ImageGraphQLApi.delete(id, _item.id)
         }
       }
       _formData['images'].removeValue = []
-      _res = await ProductApi.findById(res.data.product.id)
-      _formData['images'].originalValue = _res.data.product.images
-
+      _res = await ProductGraphQLApi.findById(id)
+      _formData['images'].originalValue = _res.data.product['images'].edges.map(
+        (value) => value.node
+      )
+      console.log('_res :>> ', _res)
       setFormData(_formData)
 
       actions.showNotify({ message: created.id ? 'Saved' : 'Created' })
 
-      onSubmited(res.data.product)
+      // onSubmited(res.data.product)
     } catch (error) {
       console.log(error)
       actions.showNotify({ error: true, message: error.message })
@@ -234,8 +274,8 @@ function CreateForm(props) {
         <Stack vertical alignment="fill">
           <FormControl {...formData['title']} onChange={(value) => handleChange('title', value)} />
           <FormControl
-            {...formData['body_html']}
-            onChange={(value) => handleChange('body_html', value)}
+            {...formData['description']}
+            onChange={(value) => handleChange('description', value)}
           />
           <Stack distribution="fillEvenly">
             <Stack.Item fill>

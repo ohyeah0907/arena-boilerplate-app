@@ -98,7 +98,7 @@ function Images(props) {
                   border: 'dashed gray',
                   borderWidth: '1px',
                 }}
-                src={item.src ? item.src : window.URL.createObjectURL(item)}
+                src={item.url ? item.url : window.URL.createObjectURL(item)}
               />
             </div>
           ))}
@@ -135,7 +135,7 @@ function Images(props) {
                 let _formData = { ...formData }
                 _formData['images'].originalValue = [
                   ...formData['images'].originalValue,
-                  { src: urlImage },
+                  { url: urlImage },
                 ]
 
                 setFormData(_formData)
