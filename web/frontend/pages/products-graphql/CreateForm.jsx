@@ -232,19 +232,22 @@ function CreateForm(props) {
         let urls = _images.filter((item) => item.url)
         if (urls.length > 0) {
           let media = urls.map((item) => ({
-            alt: item.url,
+            alt: 'external image url',
             resourceUrl: item.url,
           }))
           let __res = await ImageGraphQLApi.create(id, media)
-
-          console.log('__res :>> ', __res)
         }
       }
 
       let _removeImages = formData['images'].removeValue.filter((item) => item.id)
       if (_removeImages.length > 0) {
         for (let _item of _removeImages) {
-          _res = await ImageGraphQLApi.delete(id, _item.id)
+          console.log(_item.id.substring(_item.id.lastIndexOf('/') + 1, _item.id.length))
+          _res = await ImageGraphQLApi.delete(
+            id,
+            _item.id.substring(_item.id.lastIndexOf('/') + 1, _item.id.length)
+          )
+          console.log('_res :>> ', _res)
         }
       }
       _formData['images'].removeValue = []

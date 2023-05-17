@@ -27,6 +27,9 @@ export default {
       const { shop, accessToken } = getCurrentSession(req, res)
       const { idProduct, idImage } = req.params
 
+      console.log('idImage :>> ', idImage)
+      console.log('idProduct :>> ', idProduct)
+
       const data = await Image.delete({
         shop,
         accessToken,

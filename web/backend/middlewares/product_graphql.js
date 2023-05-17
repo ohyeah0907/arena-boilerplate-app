@@ -193,10 +193,10 @@ const update = async ({ shop, accessToken, id, data }) => {
     title: data.product['title'],
     bodyHtml: data.product['description'],
     status: data.product['status'].toUpperCase(),
-    images: data.product['images'].map((item) => ({
-      altText: item.altText,
-      src: item.url,
-    })),
+    // images: data.product['images'].map((item) => ({
+    //   altText: item.altText,
+    //   src: item.url,
+    // })),
     options: data.product['options'].map((value) => value.name),
     variants: data.product['variants'].map((value) => {
       let _variant = {}

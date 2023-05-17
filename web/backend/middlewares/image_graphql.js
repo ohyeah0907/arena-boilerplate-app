@@ -37,23 +37,26 @@ const stagedUploadsCreate = async ({ shop, accessToken, data }) => {
 }
 
 const create = async ({ shop, accessToken, idProduct, data }) => {
+  console.log('data :>> ', data)
   const variables = {
-    media: data.map((item) => ({
-      alt: item.alt,
-      mediaContentType: 'IMAGE',
-      originalSource: item.resourceUrl,
-    })),
-    productId: `gid://shopify/Product/${idProduct}`,
+    input: {
+      id: `gid://shopify/Product/${idProduct}`,
+      images: data.map((item) => ({
+        altText: item.alt,
+        src: item.resourceUrl,
+      })),
+    },
   }
-  const query = `mutation productCreateMedia($media: [CreateMediaInput!]!, $productId: ID!) {
-    productCreateMedia(media: $media, productId: $productId) {
-      mediaUserErrors {
-        code
+
+  const query = `mutation productAppendImages($input: ProductAppendImagesInput!) {
+    productAppendImages(input: $input) {
+      userErrors {
         field
         message
       }
     }
-  }`
+  }
+  `
   let res = await graphqlCaller({
     shop,
     accessToken,
@@ -65,7 +68,7 @@ const create = async ({ shop, accessToken, idProduct, data }) => {
 const _delete = async ({ shop, accessToken, idImage, idProduct }) => {
   const variables = {
     id: `gid://shopify/Product/${idProduct}`,
-    imageIds: [idImage],
+    imageIds: [`gid://shopify/ProductImage/${idImage}`],
   }
   const query = `mutation productDeleteImages($id: ID!, $imageIds: [ID!]!) {
     productDeleteImages(id: $id, imageIds: $imageIds) {
